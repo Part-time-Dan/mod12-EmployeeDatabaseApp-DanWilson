@@ -1,0 +1,1 @@
+-- insert role name, salary, and department for role into the role table

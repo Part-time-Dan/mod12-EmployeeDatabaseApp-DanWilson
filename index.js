@@ -14,3 +14,15 @@ const db = mysql.createConnection(
     },
     console.log(`Connected to the business_db database.`)
 );
+
+const appPrompts = require('./lib/prompts');
+
+function init() {
+    inquirer
+    .prompt(appPrompts)
+    .then((data) => {
+        console(data);
+    })
+};
+
+init();

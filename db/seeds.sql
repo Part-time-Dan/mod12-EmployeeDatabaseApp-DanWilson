@@ -6,7 +6,7 @@ VALUES  ("Management"),
         ("Technology");
 
 INSERT INTO role (title, salary, department_id)
-VALUES  ("Manager", 150000.00, 1),
+VALUES  ("CEO", 150000.00, 1),
         ("Accountant", 95000.00, 2),
         ("Purchaser", 75000.00, 2),
         ("HR Generalist", 60000.00, 3),
@@ -20,4 +20,5 @@ VALUES  ("Big", "Boss", 1, null),
         ("Jane", "Doe", 5, null),
         ("Guy", "Smiley", 6, 4),
         ("Kind", "Stranger", 4, 1),
-        ("Snake", "Eyes", 6, 4);
+        ("Snake", "Eyes", 6, 4),
+        ("Jill", "Valentine", 6, 4);
