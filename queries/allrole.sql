@@ -5,7 +5,7 @@ role.id AS Role_ID,
 department.name AS Department,
 role.salary AS Salary
 
-FROM business_db.role
+FROM role
 
-JOIN business_db.department
-ON business_db.department.id = business_db.role.department_id;
+JOIN department
+ON department.id = role.department_id;
