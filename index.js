@@ -2,7 +2,7 @@
 const inquirer = require('inquirer')
 const mysql = require('mysql2');
 require('dotenv').config();
-const { appPrompts,addDepartment,addRole } = require('./lib/prompts');
+const { appPrompts,addDepartment } = require('./lib/prompts');
 require('console.table');
 
 const connection = mysql.createConnection(
@@ -108,11 +108,67 @@ function makeDeptartment() {
   })
 }
 
-// response runs prompts to create a new role
 function makeRole() {
+  var query = `
+  SELECT department.id, department.name -- role.salary AS salary
+  FROM employee
+  JOIN role ON
+      employee.role_id = role.id
+  JOIN department ON
+      department.id = role.department_id
+  GROUP BY department.id`
+
+  connection.query(query, function (err,res) { 
+    if (err) throw err;
+
+    const departmentList = res.map(({id, name}) => ({
+      value: id, name: `${id} ${name}`
+    }));
+
+    console.log(res);
+    console.log("Array created");
+
+    rolePrompt(departmentList);
+
+  });
+};
+
+// response runs prompts to create a new role
+function rolePrompt(departmentList) {
   inquirer
-  .prompt(addRole)
-  .then((data))
+  .prompt([
+    {
+      type: 'input',
+      name: 'roleTitle',
+      message: 'What is the new title?'
+  },
+  {
+      type: 'input',
+      name: 'salaryAmount',
+      message: 'Enter the salary amount as a number:'
+  },
+  {
+      type: 'list',
+      name: 'roleDepartment',
+      message: 'Assign role to a department',
+      choices: departmentList
+  }
+  ])
+  .then((answer) => {
+    connection.query(`INSERT INTO role SET ?`, {
+      title: answer.roleTitle,
+      salary: answer.salaryAmount,
+      department_id: answer.roleDepartment
+    }, 
+    (err,results) =>{
+      if (err) {
+        console.log(err)
+        throw err;
+      }
+      console.log("\x1b[32m",`\nNew title \x1b[36m"${answer.roleTitle}"\x1b[32m Successfully Added! Select \x1b[37m"View all roles"\x1b[32m to confirm.\n`);
+      init();
+    } )
+  })
 }
 
 
