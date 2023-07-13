@@ -117,7 +117,7 @@ function makeRole() {
   JOIN role ON
       employee.role_id = role.id
   JOIN department ON
-      department.id = role.department_id
+      department.id = role.id
   GROUP BY department.id, department.name`,
   function (err,res) { 
     if (err) throw err;
@@ -126,7 +126,7 @@ function makeRole() {
       value: id, name: `${id} ${name}`
     }));
 
-    // console.table(res);
+    console.table(res);
     console.log("Accessing departments");
 
     rolePrompt(departmentList);
