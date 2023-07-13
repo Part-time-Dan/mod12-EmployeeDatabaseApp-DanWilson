@@ -109,24 +109,25 @@ function makeDeptartment() {
 }
 
 function makeRole() {
-  var query = `
-  SELECT department.id, department.name -- role.salary AS salary
+  connection.query(`
+  SELECT 
+    department.id,
+    department.name
   FROM employee
   JOIN role ON
       employee.role_id = role.id
   JOIN department ON
       department.id = role.department_id
-  GROUP BY department.id`
-
-  connection.query(query, function (err,res) { 
+  GROUP BY department.id, department.name`,
+  function (err,res) { 
     if (err) throw err;
 
     const departmentList = res.map(({id, name}) => ({
       value: id, name: `${id} ${name}`
     }));
 
-    console.log(res);
-    console.log("Array created");
+    // console.table(res);
+    console.log("Accessing departments");
 
     rolePrompt(departmentList);
 
@@ -166,6 +167,7 @@ function rolePrompt(departmentList) {
         throw err;
       }
       console.log("\x1b[32m",`\nNew title \x1b[36m"${answer.roleTitle}"\x1b[32m Successfully Added! Select \x1b[37m"View all roles"\x1b[32m to confirm.\n`);
+
       init();
     } )
   })
