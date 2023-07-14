@@ -1,0 +1,29 @@
+{
+  "name": "mod12-employeedatabaseapp-danwilson",
+  "version": "1.0.0",
+  "description": "Node.js command-line app using a MySQL database",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Part-time-Dan/mod12-EmployeeDatabaseApp-DanWilson.git"
+  },
+  "keywords": [],
+  "author": "daniel-wilson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Part-time-Dan/mod12-EmployeeDatabaseApp-DanWilson/issues"
+  },
+  "homepage": "https://github.com/Part-time-Dan/mod12-EmployeeDatabaseApp-DanWilson#readme",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "dotenv": "^16.3.1",
+    "inquirer": "^8.2.4",
+    "mysql2": "^3.5.0"
+  }
+}
