@@ -88,6 +88,85 @@ function displayEmployees(){
   })
 }
 
+// runs the view by manager function in the app
+function displayByManager() {
+  byManagerQuery();
+}
+
+// generates an array of managers only by querying all employees but validating if the employee.id primary key matches value in the manager_id foreign key column
+function byManagerQuery() {
+
+  connection.query(
+  `SELECT e.id,
+  CONCAT(e.first_name, ' ', e.last_name) AS Employee,
+  r.title AS Title,
+  d.name AS Department
+
+  FROM employee e
+
+  LEFT JOIN role r ON e.role_id = r.id
+  LEFT JOIN department d ON r.department_id = d.id
+  WHERE e.id IN 
+
+  (SELECT DISTINCT manager_id FROM employee WHERE manager_id IS NOT NULL);`,
+  function (err, res) {
+    if (err) throw err;
+
+    let managerList = res.map(({id, Employee, Title, Department }) => ({value: id, employee: `${Employee}`, title: `${Title}`, department: `${Department}`}))
+
+    console.log("\x1b[32m","\nDisplaying Managers")
+    console.table("\x1b[32m", res);
+  
+    byManagerPrompt(managerList);
+  });
+}
+
+// prompts for user to select from the managers array then outputs the query of all employees reporting to that manager
+function byManagerPrompt(managerList) {
+  inquirer
+  .prompt([
+    {
+      type: 'list',
+      name: 'managerId',
+      message: 'Select a manager:',
+      choices: managerList
+      .map((manager) => ({
+        value: manager.value,
+        name: manager.employee
+      }))
+    }
+  ])
+  .then((answer) => {
+    console.log(answer);
+
+    const selectedManager = managerList.find(
+      (manager) => manager.value === answer.managerId
+    );
+
+    connection.query(
+    `SELECT employee.id,
+    CONCAT(employee.first_name, ' ', employee.last_name) AS Employee,
+    role.title AS Title,
+    role.salary AS Salary,
+    department.name AS Department
+    FROM employee
+    LEFT JOIN role ON employee.role_id = role.id
+    LEFT JOIN department ON role.department_id = department.id
+    WHERE employee.manager_id = ?;`, 
+    [
+      answer.managerId
+    ],
+    function (err, res) {
+      if (err) throw err;
+
+      console.log("\x1b[32m","\nDisplaying Employees of " + "\x1b[33m", selectedManager.employee)
+      console.table("\x1b[32m", res);
+
+      init();
+    })
+  })
+}
+
 // response runs prompts to create a new department
 function makeDeptartment() {
   inquirer
@@ -185,7 +264,7 @@ function addEmployee() {
     }))
 
     console.log("Accessing roles");
-    console.table(res);
+    console.table("\x1b[32m", res);
 
     employeePrompt(roleList);
   })
@@ -267,7 +346,7 @@ function employeeQuery() {
     }));
 
     console.log("Dsiplaying Employees to Update");
-    console.table(res);
+    console.table("\x1b[32m", res);
 
     roleQuery(employeeRoleUpdate);
   });
@@ -285,7 +364,7 @@ function roleQuery(employeeRoleUpdate) {
     roles = res.map(({id, title, salary}) => ({value: id, title: `${title}`, salary: `${salary}`}))
 
     console.log("Preparing role Update")
-    console.table(res);
+    console.table("\x1b[32m", res);
   
     promptUpdateEmployee(employeeRoleUpdate, roles);
   });
@@ -324,15 +403,13 @@ function promptUpdateEmployee(employeeRoleUpdate, roles) {
     function (err, res) {
       if (err) throw err;
 
-      console.table(res);
+      console.table("\x1b[32m", res);
       console.log(res.affectedRows)
 
       init();
     })
   })
 }
-
-
 
 // runs the queries and prompts to assign employees different managers
 function updateManager() {
@@ -359,7 +436,7 @@ function managerQuery() {
     managers = res.map(({id, employee, title, manager }) => ({value: id, employee: `${employee}`, title: `${title}`, manager: `${manager}`}))
 
     console.log("Preparing Manager Update")
-    console.table(res);
+    console.table("\x1b[32m", res);
   
     promptChangeManager(managers);
   });
@@ -400,7 +477,7 @@ function promptChangeManager(managers) {
     function (err, res) {
       if (err) throw err;
 
-      console.table(res);
+      console.table("\x1b[32m", res);
       console.log(res.affectedRows)
 
       init();
@@ -422,6 +499,9 @@ function init() {
           break;
         case "View all employees":
           displayEmployees();
+          break;
+        case "View employees by manager":
+          displayByManager();
           break;
         case "Add a department":
           makeDeptartment();
