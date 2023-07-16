@@ -478,7 +478,6 @@ function promptChangeManager(managers) {
       if (err) throw err;
 
       console.table("\x1b[32m", res);
-      console.log(res.affectedRows)
 
       init();
     })
