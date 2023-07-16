@@ -22,13 +22,10 @@ connection.connect(function (err) {
     console.log(err)
     throw err;
   }
-
   console.log(`Connected to the business_db database.`)
   init()
 })
   
-
-
 // response displays all departments
 function displayDepartment() {
   console.log("Display all Departments")
@@ -41,9 +38,6 @@ function displayDepartment() {
     init();
   })
 }
-
-
-
 
 // response displays all roles
 function displayRoles(){
@@ -65,9 +59,6 @@ function displayRoles(){
     init();
   })
 }
-
-
-
 
 // response displays all employees with names of their managers listed
 function displayEmployees(){
@@ -97,9 +88,6 @@ function displayEmployees(){
   })
 }
 
-
-
-
 // response runs prompts to create a new department
 function makeDeptartment() {
   inquirer
@@ -116,13 +104,6 @@ function makeDeptartment() {
     } )
   })
 }
-
-
-
-
-
-
-
 
 function makeRole() {
   connection.query(`
@@ -144,10 +125,8 @@ function makeRole() {
 
     console.log("Accessing departments");
     console.table(res);
-    
 
     rolePrompt(departmentList);
-
   });
 };
 
@@ -191,12 +170,7 @@ function rolePrompt(departmentList) {
   })
 }
 
-
-
-
-
-
-
+// queries role table to display as choice array for the prompt
 function addEmployee() {
   connection.query(
     `SELECT role.id, role.title, role.salary
@@ -213,13 +187,11 @@ function addEmployee() {
     console.log("Accessing roles");
     console.table(res);
 
-
-
     employeePrompt(roleList);
   })
 }
 
-
+// prompts take user inputs and creates object to add to employee table by schema
 function employeePrompt(roleList) {
   inquirer
   .prompt([
@@ -265,11 +237,12 @@ function employeePrompt(roleList) {
   });
 }
 
-
+// runs the employee updater 
 function updateEmployee() {
   employeeQuery();
 }
 
+// queries employee table to help user choose and maps array for prompt choices
 function employeeQuery() {
   connection.query(
     `SELECT employee.id, 
@@ -278,7 +251,7 @@ function employeeQuery() {
       role.title AS Title, 
       department.name AS Department, 
       role.salary AS Salary, 
-      CONCAT (manager.first_name, ' ', manager.last_name) As Manager 
+      CONCAT (manager.first_name, ' ', manager.last_name) AS Manager 
     FROM employee 
     LEFT JOIN role ON 
       employee.role_id = role.id 
@@ -297,10 +270,10 @@ function employeeQuery() {
     console.table(res);
 
     roleQuery(employeeRoleUpdate);
-
   });
 }
 
+// queries roles table and maps array to display for prompt choices
 function roleQuery(employeeRoleUpdate) {
 
   let roles;
@@ -315,11 +288,10 @@ function roleQuery(employeeRoleUpdate) {
     console.table(res);
   
     promptUpdateEmployee(employeeRoleUpdate, roles);
-
   });
-
 }
 
+// runs prompts for updating employee role and queries update to the table
 function promptUpdateEmployee(employeeRoleUpdate, roles) {
   inquirer
   .prompt([
@@ -362,8 +334,81 @@ function promptUpdateEmployee(employeeRoleUpdate, roles) {
 
 
 
+// runs the queries and prompts to assign employees different managers
+function updateManager() {
+  managerQuery();
+}
 
+// sets up array of from query of employees and their managers to use to select an employee and then choose a manager for them in the prompt
+function managerQuery() {
 
+  let managers;
+
+  connection.query(`SELECT employee.id,
+  CONCAT (employee.first_name, ' ', employee.last_name) AS employee,
+  role.title,
+  CONCAT (manager.first_name, ' ', manager.last_name) AS manager
+  FROM employee
+  LEFT JOIN role ON
+  employee.role_id = role.id
+  LEFT JOIN employee manager ON 
+  employee.manager_id = manager.id`,
+  function (err, res) {
+    if (err) throw err;
+
+    managers = res.map(({id, employee, title, manager }) => ({value: id, employee: `${employee}`, title: `${title}`, manager: `${manager}`}))
+
+    console.log("Preparing Manager Update")
+    console.table(res);
+  
+    promptChangeManager(managers);
+  });
+}
+
+// prompts user with the choices and uses the queried arrays to make input simpler and more user friendly
+function promptChangeManager(managers) {
+  inquirer
+  .prompt([
+    {
+      type: 'list',
+      name: 'empId',
+      message: 'Select employee to reassign:',
+      choices: managers.map((employee) => ({
+        value: employee.value,
+        name: employee.employee,
+      })),
+    },
+    {
+      type: 'list',
+      name: 'managerId',
+      message: 'Select manager for chosen employee:',
+      choices: managers.map((employee) => ({
+        value: employee.value,
+        name: employee.employee,
+      })),
+    }
+  ])
+  .then((answer) => {
+    console.log(answer)
+    connection.query(`UPDATE employee
+    SET manager_id = ? 
+    WHERE id = ?`, 
+    [
+      answer.managerId,
+      answer.empId
+    ],
+    function (err, res) {
+      if (err) throw err;
+
+      console.table(res);
+      console.log(res.affectedRows)
+
+      init();
+    })
+  })
+}
+
+// maps user choices in app to the iniital prompt menu
 function init() {
   inquirer
     .prompt(appPrompts)
@@ -389,6 +434,9 @@ function init() {
           break;
         case "Update an employee role":
           updateEmployee();
+          break;
+        case "Update manager an employee reports to":
+          updateManager();
           break;
         default:
           connection.end()
