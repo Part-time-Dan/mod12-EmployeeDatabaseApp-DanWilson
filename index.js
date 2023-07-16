@@ -458,7 +458,7 @@ function promptChangeManager(managers) {
     {
       type: 'list',
       name: 'managerId',
-      message: 'Select manager for chosen employee:',
+      message: 'Select new manager for chosen employee:',
       choices: managers.map((employee) => ({
         value: employee.value,
         name: employee.employee,
@@ -515,7 +515,7 @@ function init() {
         case "Update an employee role":
           updateEmployee();
           break;
-        case "Update the manager of an employee":
+        case "Update manager an employee reports to":
           updateManager();
           break;
         default:
