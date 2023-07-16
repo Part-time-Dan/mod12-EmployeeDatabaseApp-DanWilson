@@ -435,7 +435,7 @@ function init() {
         case "Update an employee role":
           updateEmployee();
           break;
-        case "Update manager an employee reports to":
+        case "Update the manager of an employee":
           updateManager();
           break;
         default:
