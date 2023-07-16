@@ -1,6 +1,6 @@
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://choosealicense.com/licenses/mit/)
 
-# Content Management System- EmployeeDatabase
+# Content Management System: Employee Database
 Node.js command-line app using a MySQL database
 
 ## Description
@@ -30,7 +30,7 @@ Navigate to the root directory index.js file. From this directory, type ```node 
 
 Currently, the user can view all departments, roles and employees. The user can add departments, roles and employees. And the user can update the role of a specific employee.
 
-Additional functions being developed to update employee managers, view employees by manager, view employees by department, see total budget of a department and be able to delete from any database table.
+Additional functions being developed to ~~update employee managers~~ DONE, ~~view employees by manager~~ DONE, view employees by department (in progress), see total budget of a department and be able to delete from any database table.
 
 ## Contributions
 This is an educational project. No contributions are being accepted.
