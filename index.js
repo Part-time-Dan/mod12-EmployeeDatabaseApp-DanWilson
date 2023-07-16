@@ -345,7 +345,7 @@ function employeeQuery() {
       value: id, name: `${first_name} ${last_name}`
     }));
 
-    console.log("Dsiplaying Employees to Update");
+    console.log("\x1b[32m","Dsiplaying Employees to Update");
     console.table("\x1b[32m", res);
 
     roleQuery(employeeRoleUpdate);
@@ -404,7 +404,6 @@ function promptUpdateEmployee(employeeRoleUpdate, roles) {
       if (err) throw err;
 
       console.table("\x1b[32m", res);
-      console.log(res.affectedRows)
 
       init();
     })
